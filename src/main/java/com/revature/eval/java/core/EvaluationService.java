@@ -1,9 +1,10 @@
 package com.revature.eval.java.core;
 
-import java.text.Collator;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,11 +24,15 @@ public class EvaluationService {
 	 */
 	public String reverse(String string) {
 		String result;
+		//convert the string into an array of characters
 		char[] letter = string.toCharArray();
+		//make a temporary array to store the characters of the reversed string
 		char[] temp = new char[string.length()];
+		//take the last character of the original string and adding it to the first index of the new string
 		for(int i = 0; i < string.length(); i++) {
 			temp[string.length() - 1 - i] = letter[i];
 		}
+		//convert the char array to the new reversed string
 		result = new String(temp);
 		return result;
 	}
@@ -42,12 +47,15 @@ public class EvaluationService {
 	 */
 	public String acronym(String phrase) {
 		String result = "";
+		//we will always add the first letter of the first word
 		result = result + phrase.charAt(0);
+		//iterating through the string until we find a space and then adding the next letter(the first letter of the next word)
 		for(int i = 0; i < phrase.length(); i++) {
 			if(phrase.charAt(i) == ' ' || phrase.charAt(i) == '-') {
 				result = result + phrase.charAt(i + 1);
 			}
 		}
+		//capitalizing the acronym
 		result = result.toUpperCase();
 		return result;
 	}
@@ -102,6 +110,7 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
+			//if all sides are equal, the triangle is equilateral
 			if(getSideOne() == getSideTwo() && getSideTwo() == getSideThree()) {
 				return true;
 			}
@@ -111,6 +120,7 @@ public class EvaluationService {
 		}
 
 		public boolean isIsosceles() {
+			//if at least two side are equal it is Isosceles
 			if(getSideOne() == getSideTwo() || getSideTwo() == getSideThree() || getSideOne() == getSideThree()) {
 				return true;
 			}
@@ -120,6 +130,7 @@ public class EvaluationService {
 		}
 
 		public boolean isScalene() {
+			//if no sides are equal it is Scalene
 			if(getSideOne() != getSideTwo() && getSideTwo() != getSideThree() && getSideOne() != getSideThree()) {
 				return true;
 			}
@@ -147,34 +158,29 @@ public class EvaluationService {
 	public int getScrabbleScore(String string) {
 		int point = 0;
 		string = string.toLowerCase();
+		//check each letter of the string
 		for(int i = 0; i < string.length(); i++) {
-			switch(string.charAt(i)) {
-				case 'a': point += 1; break;
-				case 'e': point += 1; break;
-				case 'i': point += 1; break;
-				case 'o': point += 1; break;
-				case 'n': point += 1; break;
-				case 'r': point += 1; break;
-				case 't': point += 1; break;
-				case 'l': point += 1; break;
-				case 's': point += 1; break;
-				case 'u': point += 1; break;
-				case 'd': point += 2; break;
-				case 'g': point += 2; break;
-				case 'b': point += 3; break;
-				case 'c': point += 3; break;
-				case 'm': point += 3; break;
-				case 'p': point += 3; break;
-				case 'f': point += 4; break;
-				case 'h': point += 4; break;
-				case 'v': point += 4; break;
-				case 'w': point += 4; break;
-				case 'y': point += 4; break;
-				case 'k': point += 5; break;
-				case 'j': point += 8; break;
-				case 'x': point += 8; break;
-				case 'q': point += 10; break;
-				case 'z': point += 10; break;	
+			//if it matches aeionrtls or u add one point
+			if(Character.toString(string.charAt(i)).matches("[aeionrtlsu]+")) {
+				point += 1;
+			//if it matches d or g add two points
+			}else if(Character.toString(string.charAt(i)).matches("[dg]+")) {
+				point += 2;
+			//if it matches bcm or p add three points
+			}else if(Character.toString(string.charAt(i)).matches("[bcmp]+")) {
+				point += 3;
+			//if it matches fhvw or y add four points
+			}else if(Character.toString(string.charAt(i)).matches("[fhvwy]+")) {
+				point += 4;
+			//if it is k add five points
+			}else if(string.charAt(i) == 'k') {
+				point += 5;
+			//if it matches j or x add eight points
+			}else if(Character.toString(string.charAt(i)).matches("[jx]+")) {
+				point += 8;
+			//if it matches q or z add ten points
+			}else if(Character.toString(string.charAt(i)).matches("[qz]+")) {
+				point += 10;
 			}
 		}
 		return point;
@@ -212,9 +218,16 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
+		//remove all punctuation and whitespace from the original string
 		string = string.replaceAll("\\p{Punct}", "");
 		string = string.replaceAll("\\s", "");
+		//test to see if there is anything in the string that is not a number, punctuation, or whitespace
+		//if so it will return an IllegalArgumentException
 		long test = Long.parseLong(string);
+		//test if the string exceeds 10 digits, if so throw an IllegalArgumentException
+		if(string.length() > 10 || string.length() < 1) {
+			throw new java.lang.IllegalArgumentException();
+		}
 		return string;
 	}
 
@@ -228,16 +241,20 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
+		//split the string on anything that is not a letter
 		String[] phrase = string.split("[^A-Za-z]");
 		int count;
+		//hashmap to keep track of each word and its number of occurrences
 		Map<String, Integer> result = new HashMap<>();
 		for(int i = 0; i < phrase.length; i++) {
 			count = 0;
+			//pattern to find the other occurrences of each word and increment count
 			Pattern pattern = Pattern.compile(phrase[i]);
 			Matcher matcher = pattern.matcher(string);
 			while(matcher.find()) {
 				count++; 
 			}
+			//this method will also add "" as a word so this if statement prevents them from being added to the map
 			if(!phrase[i].matches("")) {
 			result.put(phrase[i], count);
 			}
@@ -284,22 +301,36 @@ public class EvaluationService {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
+			//creating variables to mark the left and right side of the array and subarrays
 			int l = 0;
 			int r = getSortedList().size() - 1;
 			while(l <= r) {
+				//set i equal to the middle index of the array
 				int i = l + ((r - l) / 2);
+				//if the value in the middle index is the one we are looking for we are done
 				if(t.toString().compareTo(getSortedList().get(i).toString()) == 0) {
 					return i;
 				}
-				if(t.toString().compareTo(getSortedList().get(i).toString()) > 0) {
-					System.out.println(r);
+				//if the value we are looking for is to the right of the middle value we set the left variable to the middle of
+				//the array to ignore the left half
+				else if(t.toString().compareTo(getSortedList().get(i).toString()) < 0) {
 					l = i + 1;
+					
 				}
+				//if the value we are looking for is to the left of the middle value we set the right variable to the middle of
+				//the array to ignore the right half
 				else {
 					r = i - 1;
 				}
 			}
-			return -1;
+			//this method is unable to find values at the beginning of arrays and I could not figure out why so I had to add this
+			//if statement
+			if (t.toString().compareTo(getSortedList().get(0).toString()) == 0) {
+				return 0;
+			} else {
+				//if the value is not found in the array we return -1
+				return -1;
+			}
 		}
 
 		public BinarySearch(List<T> sortedList) {
@@ -337,22 +368,37 @@ public class EvaluationService {
 	public String toPigLatin(String string) {
 		string.toLowerCase();
 		String result = "";
+		//split the string into an array based on whitespace
 		String[] check = string.split("\\s+");
+		//loop through each word in our array
 		for(int i = 0; i < check.length; i++) {
+			//if the word starts with a vowel add ay to the end of the word
 			if(Character.toString(check[i].charAt(0)).matches("(i?)[aeiou]+")) {
 				check[i] = check[i] + "ay";
 			}
 			else {
+				//assign the current word in the array to its own string
 				String temp = check[i];
+				//loop through each letter in the current word
 				for(int j = 0; j < temp.length(); j++) {
+					//if the letter we are currently at is a vowel we start there
 					if(Character.toString(temp.charAt(j)).matches("(i?)[aeiou]+")) {
 						String newTemp = "";
+						//there was a special case in these examples where if the vowel was preceded by a q we would need
+						//to start from the next letter instead, I would need to add more if statements for other special
+						//cases but I don't know what those cases are and will just leave this one
+						if(temp.charAt(j - 1) == 'q') {
+							j += 1;
+						}
+						//we move the end of the word to the beginning starting from the first vowel
 						for(int k = j; k < temp.length(); k++) {
 							newTemp += Character.toString(temp.charAt(k));
 						}
+						//we take what was at the beginning and move it to the end until the first vowel
 						for(int k = 0; k < j; k++) {
 							newTemp += Character.toString(temp.charAt(k));
 						}
+						//add 'ay' to the end
 						newTemp += "ay";
 						if(i < check.length - 1) {
 							newTemp += " ";
@@ -363,9 +409,10 @@ public class EvaluationService {
 				}
 			}
 		}
+		// take each new word in our array and put it in a string
 		for(int i = 0; i < check.length; i++) {
 			result += check[i];
-		}
+		}   
 		return result;
 		
 		}
@@ -388,13 +435,16 @@ public class EvaluationService {
 	public boolean isArmstrongNumber(int input) {
 		String inputString = Integer.toString(input);
 		List<String> digits = new ArrayList<>();
+		//add each digit to a string array
 		for(int i = 0; i < inputString.length(); i++) {
 			digits.add(Character.toString(inputString.charAt(i)));
 		}
 		int result = 0;
+		//add each digit raised to the number of digits
 		for(int i = 0; i < digits.size(); i++) {
 			result += Math.pow(Double.parseDouble(digits.get(i)), digits.size());
 		}
+		//if each digit raised to the number of digits equals the original number, return true
 		if(result == input) {
 			return true;
 		}
@@ -415,7 +465,9 @@ public class EvaluationService {
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
 		List<Long> result = new ArrayList<>();
+		//loop through each number up to the given one to find which numbers are evenly divisible
 		for(int i = 2; i <= l; i++) {
+			//loop to find duplicate prime numbers
 			while(l%i == 0) {
 				result.add((long) i);
 				l = l/i;
@@ -462,6 +514,7 @@ public class EvaluationService {
 			Map<Integer, Character> keyMap = new HashMap<>();
 			List<Character> phrase = new ArrayList<>();
 			List<Integer> phraseCase = new ArrayList<>();
+			//create a map with each letter of the alphabet indexed by an int
 			keyMap.put(0, 'a');
 			keyMap.put(1, 'b');
 			keyMap.put(2, 'c');
@@ -488,31 +541,39 @@ public class EvaluationService {
 			keyMap.put(23, 'x');
 			keyMap.put(24, 'y');
 			keyMap.put(25, 'z');
+			//loop to add each character of the string to a list
 			for(int i = 0; i < string.length(); i++) {
 				phrase.add(string.charAt(i));
 			}
+			//if the character is upper case, add it to a separate list to keep track of it then change it to lowercase in the original list
 			for(int c = 0; c < phrase.size(); c++) {
 				if(Character.isUpperCase(phrase.get(c))) {
 					phraseCase.add(c);
 					phrase.set(c, Character.toLowerCase(phrase.get(c)));
 				}
 			}
+			//for each letter in the string, loop through the map until you find the letter
 			for(int i = 0; i < phrase.size(); i++) {
 				for(int k = 0; k < keyMap.size(); k++) {
 					if(phrase.get(i) == (keyMap.get(k))) {
+						//then set the letter to a new letter based on the given key
 						k += key;
+						//check for rollover values
 						if(k > 25) {
 							k = k - 26;
 						}
 						phrase.set(i, keyMap.get(k));
+						//then break the inner loop
 						break;
 					}
 				}
 			}
+			//reset each changed character back to uppercase
 			for(int p = 0; p < phraseCase.size(); p++) {
 				phrase.set(phraseCase.get(p), Character.toUpperCase(phrase.get(phraseCase.get(p))));
 			}
 			String result = "";
+			//put the new word into a string and return
 			for(int j = 0; j < phrase.size(); j++) {
 				result += phrase.get(j);
 			}
@@ -534,20 +595,28 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
+		//if statement to check if the given value is not less than one
+		if(i < 1) {
+			throw new java.lang.IllegalArgumentException();
+		}
 		List<Integer> primes = new ArrayList<>();
 		int count = 1;
 		int j;
+		//loop to find prime values until we have the nth one represented as i in this case)
 		while(primes.size() < i) {
 			count++;
+			//loop to check if the current number has any factors other than one and itself
 			for(j = 2; j <= count; j++) {
 				if(count%j == 0) {
 					break;
 				}
 			}
+			//if not we add it to our list
 			if(j == count) {
 				primes.add(j);
 			}
 		}
+		//return the second to last number in the list because we started counting from zero
 		return primes.get(i - 1);
 	}
 
@@ -589,6 +658,7 @@ public class EvaluationService {
 			List<Character> newPhrase = new ArrayList<>();
 			string = string.toLowerCase();
 			String result = "";
+			//map to match each letter of the alphabet with the reverse alphabet
 			keyMap.put('a', 'z');
 			keyMap.put('b', 'y');
 			keyMap.put('c', 'x');
@@ -615,27 +685,27 @@ public class EvaluationService {
 			keyMap.put('x', 'c');
 			keyMap.put('y', 'b');
 			keyMap.put('z', 'a');
+			//iterate through the string and add each character to a list if it is a letter or number
 			for(int i = 0; i < string.length(); i++) {
+				if(Pattern.matches("[a-z]|[0-9]", Character.toString(string.charAt(i))))
 				phrase.add(string.charAt(i));
 			}
-			for(int n = 0; n < phrase.size(); n++) {
-				if(!Pattern.matches("[a-z]|[0-9]", Character.toString(phrase.get(n)))) {
-					phrase.remove(n);
-					n--;
-				}
-			}
 			for(int j = 0; j < phrase.size(); j++) {
+				//add a space after every five letters
 				if(j%5 == 0 && j != 0) {
 					newPhrase.add(' ');
 				}
+				//if the character is a letter, change it based on our map
 				if(Pattern.matches("[a-z]", Character.toString(phrase.get(j)))) {
 					newPhrase.add(keyMap.get(phrase.get(j)));
 				}
+				//if the character is a number just leave it
 				if(Pattern.matches("[0-9]", Character.toString(phrase.get(j)))) {
 					newPhrase.add(phrase.get(j));
 				}
 
 			}
+			//convert our char list back into a string
 			for(int c = 0; c < newPhrase.size(); c++) {
 				result += newPhrase.get(c);
 			}
@@ -648,6 +718,7 @@ public class EvaluationService {
 		 * @param string
 		 * @return
 		 */
+		//this method is the same as the previous
 		public static String decode(String string) {
 			Map<Character, Character> keyMap = new HashMap<>();
 			List<Character> phrase = new ArrayList<>();
@@ -681,13 +752,8 @@ public class EvaluationService {
 			keyMap.put('y', 'b');
 			keyMap.put('z', 'a');
 			for(int i = 0; i < string.length(); i++) {
+				if(Pattern.matches("[a-z]|[0-9]", Character.toString(string.charAt(i))))
 				phrase.add(string.charAt(i));
-			}
-			for(int n = 0; n < phrase.size(); n++) {
-				if(!Pattern.matches("[a-z]|[0-9]", Character.toString(phrase.get(n)))) {
-					phrase.remove(n);
-					n--;
-				}
 			}
 			for(int j = 0; j < phrase.size(); j++) {
 				if(Pattern.matches("[a-z]", Character.toString(phrase.get(j)))) {
@@ -731,20 +797,25 @@ public class EvaluationService {
 		List<Integer> ISBN = new ArrayList<>();
 		int math = 0;
 		int multiplier = 10;
+		//iterate through each number or X in the string
 		for(int i = 0; i < string.length(); i++) {
 			if(Pattern.matches("[0-9]|X", Character.toString(string.charAt(i)))) {
+				//if the character is an x add 10 to a list
 				if(string.charAt(i) == 'X') {
 					ISBN.add(10);
 				}
+				//otherwise add its numeric value
 				else {
 					ISBN.add(Character.getNumericValue(string.charAt(i)));
 				}
 			}
 		}
+		//multiply each digit by the number of digits - 1 each digit after the first
 		for(int j = 0; j < ISBN.size(); j++) {
 			math += (ISBN.get(j) * multiplier);
 			multiplier--;
 		}
+		//if the result is divisible by 11 it is valid
 		if(math % 11 == 0) {
 			return true;
 		}
@@ -770,10 +841,14 @@ public class EvaluationService {
 	public boolean isPangram(String string) {
 			Set<Character> alphabet = new HashSet<>();
 			string = string.toLowerCase();
+			//remove all punctuation and whitespace
 			string = string.replaceAll("\\s+", "");
+			string = string.replaceAll("\\p{Punct}", "");
+			//add each letter to a set
 			for(int j = 0; j < string.length(); j++) {
 				alphabet.add(string.charAt(j));
 			}
+			//because sets cannot have duplicate values if the size of the set reaches 26 it must contain every letter
 			if(alphabet.size() >= 26) {
 				return true;
 			}
@@ -791,8 +866,16 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		Temporal result = null;
+		//if the original date includes seconds we just add a gigasecond
+		if(given.isSupported(ChronoUnit.SECONDS)) {
+		result = given.plus(1_000_000_000, ChronoUnit.SECONDS);
+		}else {
+			//otherwise we need to add days, minutes, and seconds and then add a gigasecond
+			result = LocalDateTime.of(given.get(ChronoField.YEAR), given.get(ChronoField.MONTH_OF_YEAR), given.get(ChronoField.DAY_OF_MONTH), 0, 0, 0);
+			result = result.plus(1_000_000_000, ChronoUnit.SECONDS);
+		}
+		return result;
 	}
 
 	/**
@@ -816,12 +899,15 @@ public class EvaluationService {
 		int c;
 		for(int j = 0; j < set.length; j++) {
 			c = 0;
+			//for each number in the set add multiples of that number to another set up to the given number i
 			while((set[j] * c) < i) {
 					multiples.add(set[j] * c);
 					c++;
 			}
 		}
+		//convert that set into an array, I'm doing this to prevent duplicate numbers in the list but sets do not have a .get() method
 		hold.addAll(multiples);
+		//add each number together
 		for(int k = 0; k < hold.size(); k++) {
 			result += hold.get(k);
 		}
@@ -865,24 +951,30 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isLuhnValid(String string) {
-		List<Integer> card = new ArrayList<>();
+		List<Integer> temp = new ArrayList<>();
 		int result = 0;
+		//remove all whitespace from the number
 		string = string.replaceAll("\\s+", "");
+		//if the string contains anything that is not a number it is invalid
 		if(string.matches("[^0-9]+")) {
 			return false;
 		}
+		//add each digit to a list
 		for(int i = 0; i < string.length(); i++) {
-			card.add(Character.getNumericValue(string.charAt(i)));
+			temp.add(Character.getNumericValue(string.charAt(i)));
 		}
-		for(int j = card.size() - 2; j >= 0; j -= 2) {
-			card.set(j, card.get(j) * 2);
-			if(card.get(j) > 9) {
-				card.set(j, card.get(j) - 9);
+		//starting from the back of the list, multiply each other digit by two, if the new digit is greater than 9 subtract 9
+		for(int j = temp.size() - 2; j >= 0; j -= 2) {
+			temp.set(j, temp.get(j) * 2);
+			if(temp.get(j) > 9) {
+				temp.set(j, temp.get(j) - 9);
 			}
 		}
-		for(int k = 0; k < card.size(); k++) {
-			result += card.get(k);
+		//add each digit together
+		for(int k = 0; k < temp.size(); k++) {
+			result += temp.get(k);
 		}
+		//if the result is evenly divisible by 10 it is valid
 		if(result%10 == 0) {
 			return true;
 		}
@@ -918,39 +1010,31 @@ public class EvaluationService {
 	 */
 	public int solveWordProblem(String string) {
 		string = string.toLowerCase();
+		//remove all punctuation and whitespace
 		string = string.replaceAll("[\\p{Punct}&&[^-]]", "");
 		String[] problem = string.split("\\s+");
 		int result = 0;
-		String operator = "";
 		List<Integer> nums = new ArrayList<>();
 		for(int i = 0; i < problem.length; i++) {
+			//iterate through each character and if it matches and positive or negative integer, add it to a list
 			if(problem[i].matches("-?\\d+")) {
 				nums.add(Integer.parseInt(problem[i]));
 			}
+		}
+		for(int i = 0; i < problem.length; i++) {
+			//iterate through the phrase to search for keywords and perform the appropriate operation on each number found
 			if(problem[i].equals("plus")) {
-				operator = "+";
+				result = nums.get(0) + nums.get(1);
 			}
 			if(problem[i].equals("minus")) {
-				operator = "-";
+				result = nums.get(0) - nums.get(1);
 			}
 			if(problem[i].equals("multiplied") || problem[i].equals("times")) {
-				operator = "*";
+				result = nums.get(0) * nums.get(1);
 			}
 			if(problem[i].equals("divided")) {
-				operator = "/";
+				result = nums.get(0) / nums.get(1);
 			}
-		}
-		if(operator.equals("+")) {
-			result = nums.get(0) + nums.get(1);
-		}
-		if(operator.equals("-")) {
-			result = nums.get(0) - nums.get(1);
-		}
-		if(operator.equals("*")) {
-			result = nums.get(0) * nums.get(1);
-		}
-		if(operator.equals("/")) {
-			result = nums.get(0) / nums.get(1);
 		}
 		return result;
 	}
