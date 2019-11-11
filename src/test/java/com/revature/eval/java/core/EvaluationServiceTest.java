@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -257,7 +258,7 @@ public class EvaluationServiceTest {
 		List<String> sortedList = Collections.unmodifiableList(Arrays.asList("1", "3", "4", "6", "8", "9", "11"));
 
 		EvaluationService.BinarySearch<String> search = new EvaluationService.BinarySearch<>(sortedList);
-
+		
 		assertEquals(3, search.indexOf("6"));
 	}
 

@@ -1,5 +1,6 @@
 package com.revature.eval.java.core;
 
+import java.text.Collator;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class EvaluationService {
 				result = result + phrase.charAt(i + 1);
 			}
 		}
-		result.toUpperCase();
+		result = result.toUpperCase();
 		return result;
 	}
 
@@ -101,7 +102,7 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
-			if(sideOne == sideTwo && sideTwo == sideThree) {
+			if(getSideOne() == getSideTwo() && getSideTwo() == getSideThree()) {
 				return true;
 			}
 			else {
@@ -110,7 +111,7 @@ public class EvaluationService {
 		}
 
 		public boolean isIsosceles() {
-			if(sideOne == sideTwo || sideTwo == sideThree) {
+			if(getSideOne() == getSideTwo() || getSideTwo() == getSideThree() || getSideOne() == getSideThree()) {
 				return true;
 			}
 			else {
@@ -119,7 +120,7 @@ public class EvaluationService {
 		}
 
 		public boolean isScalene() {
-			if(sideOne != sideTwo && sideTwo != sideThree && sideOne != sideThree) {
+			if(getSideOne() != getSideTwo() && getSideTwo() != getSideThree() && getSideOne() != getSideThree()) {
 				return true;
 			}
 			else {
@@ -145,7 +146,7 @@ public class EvaluationService {
 	 */
 	public int getScrabbleScore(String string) {
 		int point = 0;
-		string.toLowerCase();
+		string = string.toLowerCase();
 		for(int i = 0; i < string.length(); i++) {
 			switch(string.charAt(i)) {
 				case 'a': point += 1; break;
@@ -212,8 +213,8 @@ public class EvaluationService {
 	 */
 	public String cleanPhoneNumber(String string) {
 		string = string.replaceAll("\\p{Punct}", "");
-		System.out.println(string);
 		string = string.replaceAll("\\s", "");
+		long test = Long.parseLong(string);
 		return string;
 	}
 
@@ -227,7 +228,7 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		String[] phrase = string.split("[^A-Za-z]|/n");
+		String[] phrase = string.split("[^A-Za-z]");
 		int count;
 		Map<String, Integer> result = new HashMap<>();
 		for(int i = 0; i < phrase.length; i++) {
@@ -237,11 +238,10 @@ public class EvaluationService {
 			while(matcher.find()) {
 				count++; 
 			}
-			//if(phrase[i].matches()) {
+			if(!phrase[i].matches("")) {
 			result.put(phrase[i], count);
-			//}
-		}
-		System.out.println(result);		
+			}
+		}		
 		return result;
 	}
 
@@ -284,7 +284,22 @@ public class EvaluationService {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
-			return 0;
+			int l = 0;
+			int r = getSortedList().size() - 1;
+			while(l <= r) {
+				int i = l + ((r - l) / 2);
+				if(t.toString().compareTo(getSortedList().get(i).toString()) == 0) {
+					return i;
+				}
+				if(t.toString().compareTo(getSortedList().get(i).toString()) > 0) {
+					System.out.println(r);
+					l = i + 1;
+				}
+				else {
+					r = i - 1;
+				}
+			}
+			return -1;
 		}
 
 		public BinarySearch(List<T> sortedList) {
@@ -322,27 +337,38 @@ public class EvaluationService {
 	public String toPigLatin(String string) {
 		string.toLowerCase();
 		String result = "";
-		char check = string.charAt(0);
-		if(check == 'a' || check == 'e' || check == 'i' || check == 'o' || check == 'u' ) {
-			for(int i = 0; i < string.length(); i++) {
-				if(string.charAt(i) == ' ') {
-					result += "ay ";
-				}
-				result += string.charAt(i);
+		String[] check = string.split("\\s+");
+		for(int i = 0; i < check.length; i++) {
+			if(Character.toString(check[i].charAt(0)).matches("(i?)[aeiou]+")) {
+				check[i] = check[i] + "ay";
 			}
-			result += "ay";
+			else {
+				String temp = check[i];
+				for(int j = 0; j < temp.length(); j++) {
+					if(Character.toString(temp.charAt(j)).matches("(i?)[aeiou]+")) {
+						String newTemp = "";
+						for(int k = j; k < temp.length(); k++) {
+							newTemp += Character.toString(temp.charAt(k));
+						}
+						for(int k = 0; k < j; k++) {
+							newTemp += Character.toString(temp.charAt(k));
+						}
+						newTemp += "ay";
+						if(i < check.length - 1) {
+							newTemp += " ";
+						}
+						check[i] = newTemp;
+						break;
+					}
+				}
+			}
 		}
-		else {
-			for(int i = 0; i < string.length(); i++) {
-				if(string.charAt(i) == ' ') {
-					result += "ay ";
-				}
-				result += string.charAt(i);
-			}
-			result += "ay";
+		for(int i = 0; i < check.length; i++) {
+			result += check[i];
 		}
 		return result;
-	}
+		
+		}
 
 	/**
 	 * 9. An Armstrong number is a number that is the sum of its own digits each
@@ -508,26 +534,21 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
-//			int maxSize = 10005;
-//			List<Integer> primes = new ArrayList<Integer>();
-//			boolean[] IsPrime = new boolean[maxSize];
-//			
-//			for(int x = 0; x < maxSize; x++) {
-//				IsPrime[x] = true;
-//			}
-//			for(int p = 2; p*p < maxSize; i++) {
-//				if(IsPrime[p] == true) {
-//					for(int c = p * p; c < maxSize; c += p) {
-//						IsPrime[c] = false;
-//					}
-//				}
-//			}
-//			for(int p = 2; p < maxSize; p++) {
-//				if(IsPrime[p] == true) {
-//					primes.add(p);
-//				}
-//			}
-		return 0;//primes.get(i-1);
+		List<Integer> primes = new ArrayList<>();
+		int count = 1;
+		int j;
+		while(primes.size() < i) {
+			count++;
+			for(j = 2; j <= count; j++) {
+				if(count%j == 0) {
+					break;
+				}
+			}
+			if(j == count) {
+				primes.add(j);
+			}
+		}
+		return primes.get(i - 1);
 	}
 
 	/**
@@ -749,6 +770,7 @@ public class EvaluationService {
 	public boolean isPangram(String string) {
 			Set<Character> alphabet = new HashSet<>();
 			string = string.toLowerCase();
+			string = string.replaceAll("\\s+", "");
 			for(int j = 0; j < string.length(); j++) {
 				alphabet.add(string.charAt(j));
 			}
@@ -898,9 +920,6 @@ public class EvaluationService {
 		string = string.toLowerCase();
 		string = string.replaceAll("[\\p{Punct}&&[^-]]", "");
 		String[] problem = string.split("\\s+");
-		for(int l = 0; l < problem.length; l++) {
-			System.out.println(problem[l]);
-		}
 		int result = 0;
 		String operator = "";
 		List<Integer> nums = new ArrayList<>();
@@ -921,10 +940,6 @@ public class EvaluationService {
 				operator = "/";
 			}
 		}
-		for(int n = 0; n < nums.size(); n++) {
-			System.out.println(nums.get(n));
-		}
-		System.out.println(operator);
 		if(operator.equals("+")) {
 			result = nums.get(0) + nums.get(1);
 		}
